@@ -28,7 +28,7 @@ def logitreg(rate,l2_reg,batchsize,num_epochs):
     acclist=[0]
     for epoch in range(num_epochs):
         logitreg.fit(x_train, y_train, batch_size=batchsize, epochs=1, verbose=0)
-        pred=logitreg.predict(x_test)
+        #pred=logitreg.predict(x_test)
         score,acc=logitreg.evaluate(x_test,y_test,verbose=0)
         if(epoch>=4 and abs(acc-acclist[-1])<1e-3):
             break
