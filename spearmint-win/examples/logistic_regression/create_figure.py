@@ -1,6 +1,7 @@
 from numpy import genfromtxt
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 def getmin(data):
     res=[]
@@ -151,7 +152,58 @@ plt.ylim(0.075,0.2)
 plt.legend()
 
 
-"""
-The second figure is from the first figure, but the x-axis 
-is the time elapsed.
-"""
+my_path=os.getcwd()
+time_mcmc=np.zeros((10,100))
+for iter1 in range(10):
+    outputs = os.listdir(my_path+'logitreg'+str(iter1+1)+'\\output')
+    col=0
+    for i in outputs:
+        file=my_path+'logitreg'+str(iter1+1)+'\\output\\'+i
+        f=open(file)
+        count=1
+        for line in f:
+            llist=line.split()
+            if(count==13):
+                if(col!=0):
+                    time_mcmc[iter1,col]=time_mcmc[iter1,col-1]+float(llist[3])
+                else:
+                    time_mcmc[iter1,1]=llist[3]
+                break
+            count+=1
+        if(col==99):
+            break
+        col+=1
+ 
+time_sec=np.zeros((10,100))
+for iter2 in range(10):
+    outputs = os.listdir(my_path+'logitregPersec'+str(iter2+1)+'\\output')
+    col=0
+    for i in outputs:
+        file=my_path+'logitregPersec'+str(iter2+1)+'\\output\\'+i
+        f=open(file)
+        count=1
+        for line in f:
+            llist=line.split()
+            if(count==13):
+                try:
+                    xx=float(llist[3])
+                    time_sec[iter2,col]=time_sec[iter2,col-1]+xx
+                except ValueError:
+                    col-=1
+                break
+            count+=1
+        if(col==99):
+            break
+        col+=1
+
+time_mcmc=np.mean(time_mcmc,0)
+time_sec=np.mean(time_sec,0)
+
+
+plt.errorbar(time_mcmc/60, mu_mcmc, std_mcmc, marker='.',label='GP EI MCMC',color='black')
+plt.errorbar(time_sec/60, mu_sec, std_sec, marker='.',label='GP EI per Sec',color='orange')
+plt.xlabel('Minutes')
+plt.ylabel('Min Function Value')
+plt.ylim(0.075,0.1)
+plt.xlim(4.5,70)
+plt.legend()
